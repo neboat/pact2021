@@ -27,7 +27,6 @@ RUN echo "Installing packages..." \
     > /dev/null \
   && echo "Building OpenCilk..." \
   && tar -C /usr/local/src -xzf /usr/local/src/opencilk.tar.gz \
-  && mkdir /tutorial \
   && tar -C / -xzf /tutorial.tar.gz \
   && mkdir -p /usr/local/src/opencilk/build \
   && /usr/local/src/opencilk/infrastructure/tools/build /usr/local/src/opencilk/opencilk-project \
@@ -36,10 +35,11 @@ RUN echo "Installing packages..." \
   && cmake --build /usr/local/src/opencilk/build --target install \
   && echo "Cleaning temporary files..." \
   && rm -r /usr/local/src/opencilk \
+  && rm /tutorial.tar.gz \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /tutorial/cheetah/build  && cd /tutorial/cheetah/build \
   && cmake -DCMAKE_C_COMPILER=clang -DCMAKE_C_FLAGS="-O3 -g -femulated-tls" -DCHEETAH_ENABLE_ASAN=OFF .. \
   && cmake --build . \
   && echo "export LIBRARY_PATH=/tutorial/cheetah/build/lib/x86_64-unknown-linux-gnu" >> /root/.bashrc \
-  && echo "export LD_LIBRARY_PATH=$LIBRARY_PATH" >> /root/.bashrc \
+  && echo "export LD_LIBRARY_PATH=/tutorial/cheetah/build/lib/x86_64-unknown-linux-gnu" >> /root/.bashrc \
   && echo "DOCKER IMAGE BUILT"
