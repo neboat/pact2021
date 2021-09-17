@@ -1,3 +1,16 @@
+//===----------------------------------------------------------------------===//
+// HANDS-ON: The function ParForExprAST::codegen(), and its matching
+// comment, contain a bug: the parallel loop emitted contains a race!
+//
+// 1) Fill in the necessary code at the location marked HANDS-ON to
+// enable Cilksan's instrumentation pass when RunCilksan is true.
+//
+// 2) Use Cilksan to find the race.  To use Cilksan, run this code
+// with the flags `-O0 --run-cilksan`.
+//
+// Extra credit: Fix the race bug.
+//===----------------------------------------------------------------------===//
+
 #include "KaleidoscopeJIT.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APSInt.h"
@@ -866,14 +879,6 @@ static std::unique_ptr<PrototypeAST> ParseExtern() {
 // Code Generation
 //===----------------------------------------------------------------------===//
 
-// TODO: The function ParForExprAST::codegen(), and its matching
-// comment, contain a bug: the parallel loop emitted contains a race!
-// 
-// 1) Use Cilksan to find this race.  To use Cilksan, run this code
-// with the flags `-O0 --run-cilksan`.
-//
-// 2) Fix the race bug.
-
 static std::unique_ptr<LLVMContext> TheContext;
 static std::unique_ptr<Module> TheModule;
 static std::unique_ptr<IRBuilder<>> Builder;
@@ -1634,9 +1639,12 @@ Function *FunctionAST::codegen() {
     // Validate the generated code, checking for consistency.
     verifyFunction(*TheFunction);
 
-    // Mark the function for race-detection
     if (RunCilksan)
-      TheFunction->addFnAttr(Attribute::SanitizeCilk);
+      // HANDS-ON: Add the attribute Attribute::SanitizeCilk to the
+      // function, to mark the function for race-detection.  You can
+      // add an attribute to TheFunction using
+      // TheFunction->addFnAttr(<attribute>);
+      llvm_unreachable("TODO: Add Cilksan support.");
 
     // Run the optimizer on the function.
     TheFPM->run(*TheFunction);
@@ -1755,11 +1763,15 @@ static void InitializeModuleAndPassManager() {
     TheFPM->doInitialization();
   }
 
-  // If requested, run the CilkSanitizer pass.
   if (RunCilksan)
-    TheMPM->add(createCilkSanitizerLegacyPass(/*CallsMayThrow*/false));
-    // TheMPM->add(createCilkSanitizerLegacyPass(/*JitMode*/false,
-    //                                           /*CallsMayThrow*/false));
+    // HANDS-ON: Add Cilksan's instrumentation pass to TheMPM to
+    // insert Cilksan's instrumentation to the code.  The function
+    // createCilkSanitizerLegacyPass() creates Cilksan's
+    // instrumentation pass.
+    // Recommended: Pass "false" to createCilkSanitizerLegacyPass() to
+    // inform the pass that function calls will never throw
+    // exceptions.
+    llvm_unreachable("TODO: Add Cilksan support.");
 
   // Add Tapir lowering passes.
   AddTapirLoweringPasses();

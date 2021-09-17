@@ -1,3 +1,31 @@
+//===----------------------------------------------------------------------===//
+// HANDS-ON: Fill in the SpawnExprAST::codegen() and
+// SyncExprAST::codegen() methods to implement the spawn and sync
+// Kaleidoscope expressions.
+//
+// Below is relevant documentation to complete this assignment.
+//
+// -) The global variable Builder supports three methods for
+// emitting Tapir instructions:
+//
+//   Builder->CreateDetach(<detach block>, <continue block>, <sync region>)
+//
+//   Builder->CreateReattach(<continue block>, <sync region>)
+//
+//   Builder->CreateSync(<continue block>, <sync region>)
+//
+// -) The codegen() methods maintain the TaskScopeEntry global
+// variable that keeps track of the entry basic block of the current
+// task scope, i.e., function or nested task.
+//
+// -) The codegen() methods maintain the TaskScopeSyncRegion global
+// variable that keeps track of a sync region emitted within the
+// current task scope.
+//
+// -) The CreateSyncRegion() helper function creates a sync region
+// in TaskScopeEntry.
+//===----------------------------------------------------------------------===//
+
 #include "KaleidoscopeJIT.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APSInt.h"
@@ -797,32 +825,6 @@ static std::unique_ptr<PrototypeAST> ParseExtern() {
 //===----------------------------------------------------------------------===//
 // Code Generation
 //===----------------------------------------------------------------------===//
-
-// TODO: Fill in the SpawnExprAST::codegen() and
-// SyncExprAST::codegen() methods to implement the spawn and sync
-// Kaleidoscope expressions.
-//
-// Below is relevant documentation to complete this assignment.
-//
-// -) The global variable Builder supports three methods for
-// emitting Tapir instructions:
-//
-//   Builder->CreateDetach(<detach block>, <continue block>, <sync region>)
-//
-//   Builder->CreateReattach(<continue block>, <sync region>)
-//
-//   Builder->CreateSync(<continue block>, <sync region>)
-//
-// -) The codegen() methods maintain the TaskScopeEntry global
-// variable that keeps track of the entry basic block of the current
-// task scope, i.e., function or nested task.
-//
-// -) The codegen() methods maintain the TaskScopeSyncRegion global
-// variable that keeps track of a sync region emitted within the
-// current task scope.
-//
-// -) The CreateSyncRegion() helper function creates a sync region
-// in TaskScopeEntry.
 
 static std::unique_ptr<LLVMContext> TheContext;
 static std::unique_ptr<Module> TheModule;
