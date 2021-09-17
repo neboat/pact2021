@@ -40,6 +40,6 @@ RUN echo "Installing packages..." \
   && mkdir -p /tutorial/cheetah/build  && cd /tutorial/cheetah/build \
   && cmake -DCMAKE_C_COMPILER=clang -DCMAKE_C_FLAGS="-O3 -g -femulated-tls" -DCHEETAH_ENABLE_ASAN=OFF .. \
   && cmake --build . \
-  && echo "export LIBRARY_PATH=/tutorial/cheetah/build/lib/x86_64-unknown-linux-gnu" >> /root/.bashrc \
-  && echo "export LD_LIBRARY_PATH=/tutorial/cheetah/build/lib/x86_64-unknown-linux-gnu" >> /root/.bashrc \
+  && echo "export LIBRARY_PATH=/tutorial/cheetah/build/lib/x86_64-unknown-linux-gnu:/usr/local/lib/clang/12.0.0/lib/x86_64-unknown-linux-gnu" >> /root/.bashrc \
+  && echo "export LD_LIBRARY_PATH=/tutorial/cheetah/build/lib/x86_64-unknown-linux-gnu:/usr/local/lib/clang/12.0.0/lib/x86_64-unknown-linux-gnu" >> /root/.bashrc \
   && echo "DOCKER IMAGE BUILT"
