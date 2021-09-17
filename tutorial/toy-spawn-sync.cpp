@@ -1667,6 +1667,8 @@ static int usage(char *argv[]) {
   errs() << "Usage: " << argv[0]
          << " --lower-tapir-to {cilk|none}"
          << " [--run-cilksan]"
+         << " [--print-ir]"
+         << " [-O[0-3]]"
          << "\n";
   return 1;
 }
