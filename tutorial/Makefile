@@ -12,4 +12,4 @@ run:
 	LD_LIBRARY_PATH="$(PWD)/cheetah/build/lib/`$(LLVM_CONFIG) --host-target`/:`$(LLVM_CONFIG) --libdir`/clang/12.0.0/lib/`$(LLVM_CONFIG) --host-target`/" LIBRARY_PATH=$$LD_LIBRARY_PATH ./$(TARGET) $(OPTS)
 
 clean:
-	rm -rf $(TARGETS)
+	rm -rf $(TARGETS) *~
