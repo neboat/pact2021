@@ -8,6 +8,7 @@
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/IRPrintingPasses.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/IntrinsicInst.h"
 #include "llvm/IR/LLVMContext.h"
@@ -1759,6 +1760,9 @@ static void InitializeModuleAndPassManager() {
   if (RunCilksan)
     TheMPM->add(createCilkSanitizerLegacyPass(/*CallsMayThrow*/false));
 
+  if (PrintIR)
+    TheMPM->add(createPrintFunctionPass(errs(), "IR dump"));
+
   // Add Tapir lowering passes.
   AddTapirLoweringPasses();
 }
@@ -1766,11 +1770,11 @@ static void InitializeModuleAndPassManager() {
 static void HandleDefinition() {
   if (auto FnAST = ParseDefinition()) {
     if (auto *FnIR = FnAST->codegen()) {
-      if (PrintIR) {
-	fprintf(stderr, "Read function definition:");
-	FnIR->print(errs());
-	fprintf(stderr, "\n");
-      }
+      // if (PrintIR) {
+      // 	fprintf(stderr, "Read function definition:");
+      // 	FnIR->print(errs());
+      // 	fprintf(stderr, "\n");
+      // }
       ExitOnErr(TheJIT->addModule(
           ThreadSafeModule(std::move(TheModule), std::move(TheContext))));
       InitializeModuleAndPassManager();
@@ -1784,11 +1788,11 @@ static void HandleDefinition() {
 static void HandleExtern() {
   if (auto ProtoAST = ParseExtern()) {
     if (auto *FnIR = ProtoAST->codegen()) {
-      if (PrintIR) {
-	fprintf(stderr, "Read extern: ");
-	FnIR->print(errs());
-	fprintf(stderr, "\n");
-      }
+      // if (PrintIR) {
+      // 	fprintf(stderr, "Read extern: ");
+      // 	FnIR->print(errs());
+      // 	fprintf(stderr, "\n");
+      // }
       FunctionProtos[ProtoAST->getName()] = std::move(ProtoAST);
     }
   } else {
