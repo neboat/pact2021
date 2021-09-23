@@ -891,7 +891,13 @@ static std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionProtos;
 static ExitOnError ExitOnErr;
 
 // Variables for codegen for the current task scope.
+
+// TaskScopeEntry keeps track of the entry basic block of the function
+// or nested task being emitted.
 static BasicBlock *TaskScopeEntry = nullptr;
+
+// TaskScopeSyncRegion keeps track of a call to
+// @llvm.syncregion.start() in TaskScopeEntry, if one exists.
 static Value *TaskScopeSyncRegion = nullptr;
 
 // Flags controlled from the command line.
