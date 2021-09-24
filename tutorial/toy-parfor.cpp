@@ -1877,7 +1877,8 @@ static void MainLoop() {
 
 static int usage(char *argv[]) {
   errs() << "Usage: " << argv[0]
-         << " --lower-tapir-to {cilk|none}"
+         << " [-h|--help]"
+         << " [--lower-tapir-to {cilk|none}]"
          << " [--run-cilksan]"
          << " [--print-ir]"
          << " [-O[0-3]]"
@@ -1891,7 +1892,9 @@ int main(int argc, char *argv[]) {
 
   // Parse command-line arguments
   for (int i = 1; i < argc; ++i) {
-    if (std::string(argv[i]) == "--lower-tapir-to") {
+    if (std::string(argv[i]) == "-h" || std::string(argv[i]) == "--help") {
+      return usage(argv);
+    } else if (std::string(argv[i]) == "--lower-tapir-to") {
       std::string targetStr = std::string(argv[++i]);
       if (targetStr == "cilk") {
         TheTapirTarget = TapirTargetID::OpenCilk;
