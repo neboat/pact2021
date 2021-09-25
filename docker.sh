@@ -3,7 +3,8 @@
 # these can be adjusted if desired
 REPO="pact2021tutorial"
 TAG=latest
-IMAGE_ZIP="docker-$REPO-$TAG.tar.gz"
+ZIP_TAG=20210924
+IMAGE_ZIP="docker-$REPO-$ZIP_TAG.tar.gz"
 CONTAINER_NAME="opencilk"
 TUTORIAL_DIR="tutorial"
 
@@ -28,7 +29,7 @@ copy_and_quit() {
 
 run_with_mount() {
     echo "docker run -it -u=$(id -ur):$(id -gr) --name $CONTAINER_NAME --rm -v $PWD/tutorial:/tutorial $REPO:$TAG"
-    docker run -it --name $CONTAINER_NAME --rm -v $PWD/tutorial:/tutorial $REPO:$TAG
+    docker run -it -u=$(id -ur):$(id -gr) --name $CONTAINER_NAME --rm -v $PWD/tutorial:/tutorial $REPO:$TAG
 }
 
 init() {
@@ -43,4 +44,3 @@ elif [[ $# -gt 0 && $1 = "run" ]]; then
 else
     echo "./docker.sh [init|run]"
 fi
-

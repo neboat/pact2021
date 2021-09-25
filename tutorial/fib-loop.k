@@ -7,4 +7,4 @@ def fib(n)
 def fibloop(n)
   parfor i = 0, i < n in
     fib(i);
-fibloop(10);
+fibloop(30);

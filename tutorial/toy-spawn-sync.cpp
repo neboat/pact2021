@@ -891,7 +891,6 @@ static AllocaInst *CreateEntryBlockAlloca(Function *TheFunction,
 static AllocaInst *CreateTaskEntryBlockAlloca(StringRef VarName,
                                               Type *AllocaTy =
                                               Type::getDoubleTy(*TheContext)) {
-  // BasicBlock *TaskEntry = GetDetachedCtx(BB);
   BasicBlock *TaskEntry = TaskScopeEntry;
   if (!TaskEntry) {
     LogError("No local task scope.");
