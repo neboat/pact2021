@@ -1,14 +1,16 @@
 //===----------------------------------------------------------------------===//
 // HANDS-ON: The function ParForExprAST::codegen(), and its matching
-// comment, contain a bug: the parallel loop emitted contains a race!
+// comment, contain a bug: the parallel loop emitted contains a
+// determinacy race!
 //
-// 1) Fill in the necessary code at the location marked HANDS-ON to
+// 1) Fill in the necessary code at the locations marked HANDS-ON to
 // enable Cilksan's instrumentation pass when RunCilksan is true.
 //
-// 2) Use Cilksan to find the race.  To use Cilksan, run this code
-// with the flags `-O0 --run-cilksan`.
+// 2) Use Cilksan to find the race.  To use Cilksan, compile this code
+// and run it with the flags `-O0 --run-cilksan`.
 //
 // Extra credit: Fix the race bug.
+//
 //===----------------------------------------------------------------------===//
 
 #include "KaleidoscopeJIT.h"
@@ -1346,13 +1348,17 @@ Value *SpawnExprAST::codegen() {
   // Create a sync region for the local function or task scope, if necessary.
   if (!TaskScopeSyncRegion)
     TaskScopeSyncRegion = CreateSyncRegion(*TheModule);
+  // Get the sync region for this task scope.
   Value *SyncRegion = TaskScopeSyncRegion;
   Function *TheFunction = Builder->GetInsertBlock()->getParent();
 
-  // Create the detach and continue blocks.  Insert the continue block at the
-  // end of the function.
+  // Create the detach and continue blocks.  Insert the continue block
+  // at the end of the function.
   BasicBlock *DetachBB = BasicBlock::Create(*TheContext, "detachbb",
                                             TheFunction);
+  // We hold off inserting ContinueBB into TheFunction until after we
+  // emit the spawned statement, to make the final LLVM IR a bit
+  // cleaner.
   BasicBlock *ContinueBB = BasicBlock::Create(*TheContext, "continbb");
 
   // Create the detach and prepare to emit the spawned expression starting in
@@ -1383,6 +1389,7 @@ Value *SyncExprAST::codegen() {
   // Create a sync region for the local function or task scope, if necessary.
   if (!TaskScopeSyncRegion)
     TaskScopeSyncRegion = CreateSyncRegion(*TheModule);
+  // Get the sync region for this task scope.
   Value *SyncRegion = TaskScopeSyncRegion;
   Function *TheFunction = Builder->GetInsertBlock()->getParent();
 
@@ -1647,11 +1654,13 @@ Function *FunctionAST::codegen() {
     verifyFunction(*TheFunction);
 
     if (RunCilksan)
+      //------------------------------------------------------------------
       // HANDS-ON: Add the attribute Attribute::SanitizeCilk to the
       // function, to mark the function for race-detection.  You can
       // add an attribute to TheFunction using
       // TheFunction->addFnAttr(<attribute>);
-      llvm_unreachable("TODO: Add Cilksan support.");
+      //------------------------------------------------------------------
+      llvm_unreachable("HANDS-ON: Add Cilksan support.");
 
     // Run the optimizer on the function.
     TheFPM->run(*TheFunction);
@@ -1771,14 +1780,17 @@ static void InitializeModuleAndPassManager() {
   }
 
   if (RunCilksan)
+    //------------------------------------------------------------------
     // HANDS-ON: Add Cilksan's instrumentation pass to TheMPM to
     // insert Cilksan's instrumentation to the code.  The function
     // createCilkSanitizerLegacyPass() creates Cilksan's
     // instrumentation pass.
+    //
     // Recommended: Pass "false" to createCilkSanitizerLegacyPass() to
     // inform the pass that function calls will never throw
     // exceptions.
-    llvm_unreachable("TODO: Add Cilksan support.");
+    //------------------------------------------------------------------
+    llvm_unreachable("HANDS-ON: Add Cilksan support.");
 
   if (PrintIR)
     TheMPM->add(createPrintFunctionPass(errs(), "IR dump"));

@@ -1333,13 +1333,17 @@ Value *SpawnExprAST::codegen() {
   // Create a sync region for the local function or task scope, if necessary.
   if (!TaskScopeSyncRegion)
     TaskScopeSyncRegion = CreateSyncRegion(*TheModule);
+  // Get the sync region for this task scope.
   Value *SyncRegion = TaskScopeSyncRegion;
   Function *TheFunction = Builder->GetInsertBlock()->getParent();
 
-  // Create the detach and continue blocks.  Insert the continue block at the
-  // end of the function.
+  // Create the detach and continue blocks.  Insert the continue block
+  // at the end of the function.
   BasicBlock *DetachBB = BasicBlock::Create(*TheContext, "detachbb",
                                             TheFunction);
+  // We hold off inserting ContinueBB into TheFunction until after we
+  // emit the spawned statement, to make the final LLVM IR a bit
+  // cleaner.
   BasicBlock *ContinueBB = BasicBlock::Create(*TheContext, "continbb");
 
   // Create the detach and prepare to emit the spawned expression starting in
@@ -1370,6 +1374,7 @@ Value *SyncExprAST::codegen() {
   // Create a sync region for the local function or task scope, if necessary.
   if (!TaskScopeSyncRegion)
     TaskScopeSyncRegion = CreateSyncRegion(*TheModule);
+  // Get the sync region for this task scope.
   Value *SyncRegion = TaskScopeSyncRegion;
   Function *TheFunction = Builder->GetInsertBlock()->getParent();
 

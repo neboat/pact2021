@@ -1,29 +1,27 @@
 //===----------------------------------------------------------------------===//
 // HANDS-ON: Fill in the SpawnExprAST::codegen() and
-// SyncExprAST::codegen() methods to implement the spawn and sync
+// SyncExprAST::codegen() methods, at the locations marked HANDS-ON,
+// to generate Tapir instructions to implement the spawn and sync
 // Kaleidoscope expressions.
 //
-// Below is relevant documentation to complete this assignment.
-//
-// -) The global variable Builder supports three methods for
-// emitting Tapir instructions:
+// You can use the following methods supported by the global variable
+// Builder to generate Tapir instructions:
 //
 //   Builder->CreateDetach(<detach block>, <continue block>, <sync region>)
 //
+//     Create a Tapir detach instruction with the given detach block,
+//     continue block, and sync region.
+//
 //   Builder->CreateReattach(<continue block>, <sync region>)
+//
+//     Create a Tapir reattach instruction with the given continue
+//     block and sync region.
 //
 //   Builder->CreateSync(<continue block>, <sync region>)
 //
-// -) The codegen() methods maintain the TaskScopeEntry global
-// variable that keeps track of the entry basic block of the current
-// task scope, i.e., function or nested task.
+//     Create a Tapir sync instruction with the given continue block
+//     and sync region.
 //
-// -) The codegen() methods maintain the TaskScopeSyncRegion global
-// variable that keeps track of a sync region emitted within the
-// current task scope.
-//
-// -) The CreateSyncRegion() helper function creates a sync region
-// in TaskScopeEntry.
 //===----------------------------------------------------------------------===//
 
 #include "KaleidoscopeJIT.h"
@@ -1290,11 +1288,17 @@ static Value *CreateSyncRegion(Module &M) {
 //   reattach within sync_region, continbb
 // continbb:
 Value *SpawnExprAST::codegen() {
-  // TODO: Finish implementing this function by completing the
-  // following exercises.  Remove the following line to test your
-  // implementation.
-  llvm_unreachable("SpawnExprAST::codegen() not yet implemented.");
+  //------------------------------------------------------------------
+  // HANDS-ON: Finish implementing this function by completing the
+  // following HANDS-ON exercises.  Remove the following line to test
+  // your implementation.
+  llvm_unreachable("HANDS-ON: SpawnExprAST::codegen() not yet implemented.");
 
+  // Create a sync region for the local function or task scope, if necessary.
+  if (!TaskScopeSyncRegion)
+    TaskScopeSyncRegion = CreateSyncRegion(*TheModule);
+  // Get the sync region for this task scope.
+  Value *SyncRegion = TaskScopeSyncRegion;
   Function *TheFunction = Builder->GetInsertBlock()->getParent();
 
   // Create the detach and continue blocks.  Insert the continue block
@@ -1307,14 +1311,11 @@ Value *SpawnExprAST::codegen() {
   BasicBlock *ContinueBB = BasicBlock::Create(*TheContext, "continuebb");
 
 
-  // [Exercise 1] Add code to get the sync region for the current task
-  // scope.  If the current task scope does not have a sync region --
-  // i.e., TaskScopeSyncRegion == nullptr -- then create a sync region
-  // for this task scope.
-
-
-  // [Exercise 2] Emit a Tapir detach instruction to detach basic block
-  // DetachBB, with ContinueBB as the continuation basic block.
+  //------------------------------------------------------------------
+  // HANDS-ON: Emit a Tapir detach instruction within SyncRegion to
+  // detach basic block DetachBB, with ContinueBB as the continuation
+  // basic block.
+  //------------------------------------------------------------------
 
 
   // Begin emitting code from DetachBB.
@@ -1323,16 +1324,23 @@ Value *SpawnExprAST::codegen() {
   // Emit the spawned expression.  This, like any other expr, can
   // change the current BB.
   //
-  // [Extra credit] Modify the following code to support nested
+  // Extra credit HANDS-ON: Modify the following code to support nested
   // spawns.
-  //   -) HINT: You can use TaskScopeRAII to manage the TaskScopeEntry
-  //   and TaskScopeSyncRegion variables among these nested tasks.
+  //
+  // -) HINT: The TaskScopeEntry variable keeps track of the entry
+  // block of the task scope currently being emitted.  The
+  // TaskScopeSyncRegion variable keeps track of the sync region
+  // started in the task scope currently being emitted.  You can use
+  // TaskScopeRAII to manage these variables when code-generating a
+  // nested task.
   if (!Spawned->codegen())
     return nullptr;
 
 
-  // [Exercise 3] Emit a reattach to ContinuBB at the end of the
-  // spawned computation.
+  //------------------------------------------------------------------
+  // HANDS-ON: Emit a reattach within SyncRegion to ContinueBB at the
+  // end of the spawned computation.
+  //------------------------------------------------------------------
 
 
   // Insert ContinueBB into TheFunction now, after we have finished
@@ -1345,17 +1353,17 @@ Value *SpawnExprAST::codegen() {
 }
 
 Value *SyncExprAST::codegen() {
-  // TODO: Finish implementing this function by completing the
-  // following exercises.  Remove the following line to test your
-  // implementation.
-  llvm_unreachable("SyncExprAST::codegen() not yet implemented.");
+  //------------------------------------------------------------------
+  // HANDS-ON: Finish implementing this function by completing the
+  // following HANDS-ON exercises.  Remove the following line to test
+  // your implementation.
+  llvm_unreachable("HANDS-ON: SyncExprAST::codegen() not yet implemented.");
 
-
-  // [Exercise 1] Add code to get the sync region for the current task
-  // scope.  If the current task scope does not have a sync region --
-  // i.e., TaskScopeSyncRegion == nullptr -- then create a sync region
-  // for this task scope.
-
+  // Create a sync region for the local function or task scope, if necessary.
+  if (!TaskScopeSyncRegion)
+    TaskScopeSyncRegion = CreateSyncRegion(*TheModule);
+  // Get the sync region for this task scope.
+  Value *SyncRegion = TaskScopeSyncRegion;
 
   Function *TheFunction = Builder->GetInsertBlock()->getParent();
 
@@ -1364,8 +1372,10 @@ Value *SyncExprAST::codegen() {
                                                   TheFunction);
 
 
-  // [Exercise 2] Emit a Tapir sync instruction with SyncContinueBB as
-  // its continuation.
+  //------------------------------------------------------------------
+  // HANDS-ON: Emit a Tapir sync instruction within SyncRegion with
+  // SyncContinueBB as its continuation.
+  //------------------------------------------------------------------
 
 
   Builder->SetInsertPoint(SyncContinueBB);
