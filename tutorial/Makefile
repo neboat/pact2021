@@ -2,7 +2,7 @@ CC = clang
 CXX = clang++
 LLVM_CONFIG = llvm-config
 
-TARGETS = nqueens seq-nqueens toy-spawn-sync toy-parfor
+TARGETS = nqueens racy-nqueens toy-spawn-sync toy-parfor
 RUNTIME_BUILD = /tutorial/cheetah/build
 
 .PHONY: clean cheetah
@@ -26,6 +26,9 @@ default: $(TARGETS)
 	$(CXX) -g $< `$(LLVM_CONFIG) --cxxflags --ldflags --system-libs --libs core orcjit native` -O3 -o $@
 
 nqueens : nqueens.c
+	$(CC) -femulated-tls -g $< -fopencilk --opencilk-resource-dir=/tutorial/cheetah/build $(CFLAGS) -o $@
+
+racy-nqueens : racy-nqueens.c
 	$(CC) -femulated-tls -g $< -fopencilk --opencilk-resource-dir=/tutorial/cheetah/build $(CFLAGS) -o $@
 
 # run:
